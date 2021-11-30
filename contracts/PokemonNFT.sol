@@ -9,10 +9,8 @@ import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 contract PokemonNFT is ERC721URIStorage, Ownable, ERC721Burnable, ERC721Enumerable {
-  using SafeMath for uint256;
   // using EnumerableMap for EnumerableMap.UintToAddressMap;
   // EnumerableMap.UintToAddressMap private pokemonMap;
   mapping(address => bool) internal approved;
