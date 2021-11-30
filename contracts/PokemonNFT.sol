@@ -11,12 +11,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
-contract PokemonNFT is
-  ERC721URIStorage,
-  Ownable,
-  ERC721Burnable,
-  ERC721Enumerable
-{
+contract PokemonNFT is ERC721URIStorage, Ownable, ERC721Burnable, ERC721Enumerable {
   using SafeMath for uint256;
   // using EnumerableMap for EnumerableMap.UintToAddressMap;
   // EnumerableMap.UintToAddressMap private pokemonMap;
@@ -92,11 +87,7 @@ contract PokemonNFT is
     uint256 winnerOfBattle
   );
 
-  event RequestToFightz(
-    uint256 pokemonA,
-    uint256 pokemonB,
-    uint256 timestampOfRequest
-  );
+  event RequestToFightz(uint256 pokemonA, uint256 pokemonB, uint256 timestampOfRequest);
 
   constructor() ERC721("PokemonNFT", "PokNFT") {}
 

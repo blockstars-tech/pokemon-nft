@@ -29,10 +29,7 @@ contract CreatePokemon is PokemonNFT {
     returns (uint256 _id)
   {
     _id = _tokenID.current();
-    require(
-      ownerOfPokemon[_id] == address(0),
-      "This Pokemon is already minted!"
-    );
+    require(ownerOfPokemon[_id] == address(0), "This Pokemon is already minted!");
     uint256 totalAmount = _amount * increasePowerFee;
     require(msg.value >= totalAmount, "insufficient funds!!");
     uint256 ownerTax = _amount * ownerCut;
@@ -44,20 +41,7 @@ contract CreatePokemon is PokemonNFT {
     pokemonworth[_id] += _amount;
     creationTimestamp = block.timestamp;
     // comment out the creation timestamp?
-    pokemons.push(
-      Pokemon(
-        _name,
-        _age,
-        _sex,
-        _color,
-        _strength,
-        creationTimestamp,
-        0,
-        0,
-        0,
-        0
-      )
-    );
+    pokemons.push(Pokemon(_name, _age, _sex, _color, _strength, creationTimestamp, 0, 0, 0, 0));
     ownerOfPokemon[_id] = msg.sender;
     ownedPokemonCount[msg.sender]++;
     mintedPokemon[_id] = true;

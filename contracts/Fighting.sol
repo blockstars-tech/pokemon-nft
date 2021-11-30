@@ -18,17 +18,11 @@ contract Fighting is CreatePokemon {
 
   function randMod(uint256 _modulus) internal returns (uint256) {
     randNum = randNum++;
-    return
-      uint256(
-        keccak256(abi.encodePacked(block.timestamp, msg.sender, randNum))
-      ) % _modulus;
+    return uint256(keccak256(abi.encodePacked(block.timestamp, msg.sender, randNum))) % _modulus;
   }
 
   function challenge(uint256 pokeA, uint256 pokeb) public {
-    require(
-      ownerOfPokemon[pokeA] == msg.sender,
-      "You can't initiate the fight"
-    );
+    require(ownerOfPokemon[pokeA] == msg.sender, "You can't initiate the fight");
     require(mintedPokemon[pokeA], "Pokemon not ready to fight");
     require(mintedPokemon[pokeb], "Enemy Pokemon not ready to fight");
     require(!waitingForFight[pokeA], "You are on hold");
@@ -51,26 +45,14 @@ contract Fighting is CreatePokemon {
   // FIXME: remove number from acceptchallenge input
   // FIXME: remove timestamp from input acceptchallenge
 
-  function acceptChallenge(
-    uint256 _pokemonReceiverid,
-    uint256 _pokemonChallengerid
-  ) public {
-    require(
-      ownerOfPokemon[_pokemonReceiverid] == msg.sender,
-      "You are not the owner"
-    );
-    require(
-      waitingForResponse[_pokemonReceiverid] == true,
-      "not been invited to a challenge!"
-    );
+  function acceptChallenge(uint256 _pokemonReceiverid, uint256 _pokemonChallengerid) public {
+    require(ownerOfPokemon[_pokemonReceiverid] == msg.sender, "You are not the owner");
+    require(waitingForResponse[_pokemonReceiverid] == true, "not been invited to a challenge!");
     uint256 _number = numbss;
     // require(
     //   Requestid[Number] == Requestid[_pokemonChallenger, _pokemonReceiver, timestampss]
     // );
-    require(
-      sentAResponse[_pokemonChallengerid] == true,
-      "Pokemon has not sent a Response!"
-    );
+    require(sentAResponse[_pokemonChallengerid] == true, "Pokemon has not sent a Response!");
     acceptedRequest[_number] = true;
 
     emit NumberofFight(_number);
@@ -82,10 +64,7 @@ contract Fighting is CreatePokemon {
     uint256 pokemonA,
     uint256 _number // uint256 Timetime,
   ) public {
-    require(
-      ownerOfPokemon[pokemonA] == msg.sender,
-      "You can not cancel this fight"
-    );
+    require(ownerOfPokemon[pokemonA] == msg.sender, "You can not cancel this fight");
     require(acceptedRequest[_number] == false, "The battle already happened!!");
     // add a function here that reverses the action of initiating battle;
     require(sentAResponse[pokemonA] == true, "You have not initiated a fight");
@@ -96,34 +75,13 @@ contract Fighting is CreatePokemon {
     return pokemons[_id].currentLossCount;
   }
 
-  function attackPokemons(
-    uint256 challengedPokemonid,
-    uint256 challengerPokemonid
-  ) public {
-    require(
-      ownerOfPokemon[challengedPokemonid] == msg.sender,
-      "You don't own this pokemon"
-    );
-    require(
-      mintedPokemon[challengedPokemonid],
-      "This Pokemon is not minted/ready yet "
-    );
-    require(
-      mintedPokemon[challengerPokemonid],
-      "Challenger pokemon is not minted yet"
-    );
-    require(
-      sentAResponse[challengerPokemonid] == true,
-      "Enemy pokemon has not sent a response"
-    );
-    require(
-      pokemons[challengedPokemonid].currentLossCount < 2,
-      "This pokemon is in cooldown"
-    );
-    require(
-      pokemons[challengerPokemonid].currentLossCount < 2,
-      "This pokemon is in cooldown"
-    );
+  function attackPokemons(uint256 challengedPokemonid, uint256 challengerPokemonid) public {
+    require(ownerOfPokemon[challengedPokemonid] == msg.sender, "You don't own this pokemon");
+    require(mintedPokemon[challengedPokemonid], "This Pokemon is not minted/ready yet ");
+    require(mintedPokemon[challengerPokemonid], "Challenger pokemon is not minted yet");
+    require(sentAResponse[challengerPokemonid] == true, "Enemy pokemon has not sent a response");
+    require(pokemons[challengedPokemonid].currentLossCount < 2, "This pokemon is in cooldown");
+    require(pokemons[challengerPokemonid].currentLossCount < 2, "This pokemon is in cooldown");
     uint256 randomNumber = randMod(100);
     _whoIsTheWinner(challengedPokemonid, challengerPokemonid, randomNumber);
   }
@@ -133,10 +91,7 @@ contract Fighting is CreatePokemon {
   }
 
   function battleReady(uint256 _id) internal {
-    require(
-      pokemons[_id].readyTime <= block.timestamp,
-      "Cooldown has not been completed yet"
-    );
+    require(pokemons[_id].readyTime <= block.timestamp, "Cooldown has not been completed yet");
     pokemons[_id].currentLossCount = 0;
   }
 
@@ -148,8 +103,7 @@ contract Fighting is CreatePokemon {
     Pokemon memory myPokemon = pokemons[_challengedPokemonid];
     Pokemon memory enemyPokemon = pokemons[_challengerPokemonid];
     uint256 mypokemonPercent = (myPokemon.strength * 100);
-    uint256 percentPokA = (mypokemonPercent /
-      (myPokemon.strength + enemyPokemon.strength)) - 1;
+    uint256 percentPokA = (mypokemonPercent / (myPokemon.strength + enemyPokemon.strength)) - 1;
     if (percentPokA < _randomNumber) {
       pokemons[_challengedPokemonid].winCount++;
       pokemons[_challengedPokemonid].currentLossCount = 0;
