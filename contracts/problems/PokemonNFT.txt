@@ -1,0 +1,17 @@
+1)  unnecessary use of SafeMath in all files
+2)  mintedPokemon mapping should be moved to CreatePokemon.sol file
+3)  ownerOfPokemon mapping should be moved to CreatePokemon.sol file
+4)  ownedPokemonCount mapping should be moved to CreatePokemon.sol file
+5)  waitingForFight mapping should be moved to Fighting.sol file
+6)  waitingForResponse mapping should be moved to Fighting.sol file
+7)  sentAResponse mapping should be moved to Fighting.sol file
+8)  pokemonworth mapping should be moved to CreatePokemon.sol file
+9)  requestid mapping should be renamed to requestId file
+10) requestid mapping should be moved to Fighting.sol file
+11) acceptedRequest mapping should be moved to Fighting.sol file
+12) unnecessary state variable creationTimestamp
+13) RequestToFight.pokemona should be renamed to pokemonAID
+14) requestsToFights should be moved to Fighting.sol file
+15) pokemons should be moved to CreatePokemon.sol file
+16) unused state variable battles
+17) unused struct Battle
