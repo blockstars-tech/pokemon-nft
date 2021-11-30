@@ -5,16 +5,39 @@ pragma solidity ^0.8.4;
 import "./CreatePokemon.sol";
 
 contract Fighting is CreatePokemon {
-  using SafeMath for uint256;
+  mapping(uint256 => bool) internal waitingForFight;
+  mapping(uint256 => bool) internal waitingForResponse;
+  mapping(uint256 => bool) internal sentAResponse;
+  mapping(uint256 => RequestToFight) internal requestId;
+  mapping(uint256 => bool) internal acceptedRequest;
   uint256 public winnerPokemon;
   uint256 public loserPokemon;
   uint256 public randNum = 0;
   uint256 public cooldownTime = 1 days;
   uint256 private _num = 0;
+  uint256 private _battlenumber = 0;
   uint256 private currentNumber;
   uint256 private numbss;
 
+  struct RequestToFight {
+    uint256 pokemonAID;
+    uint256 pokemonBID;
+    uint256 timestampOfRequest;
+  }
+
+  RequestToFight[] public requestsToFights;
+
+  event BattleHappened(
+    uint256 pokemonAID,
+    uint256 pokemonBID,
+    uint256 battleNumber,
+    uint256 timeStamp,
+    uint256 winnerOfBattle
+  );
+
   event NumberofFight(uint256 num);
+
+  event RequestToFightz(uint256 pokemonAId, uint256 pokemonBId, uint256 timestampOfRequest);
 
   function randMod(uint256 _modulus) internal returns (uint256) {
     randNum = randNum++;
@@ -36,29 +59,23 @@ contract Fighting is CreatePokemon {
       battleReady(pokeb);
     }
     requestsToFights.push(RequestToFight(pokeA, pokeb, block.timestamp));
-    requestid[currentNumber] = RequestToFight(pokeA, pokeb, block.timestamp);
+    requestId[currentNumber] = RequestToFight(pokeA, pokeb, block.timestamp);
     sentAResponse[pokeA] = true;
     _num++;
     emit RequestToFightz(pokeA, pokeb, block.timestamp);
   }
 
-  // FIXME: remove number from acceptchallenge input
-  // FIXME: remove timestamp from input acceptchallenge
-
   function acceptChallenge(uint256 _pokemonReceiverid, uint256 _pokemonChallengerid) public {
     require(ownerOfPokemon[_pokemonReceiverid] == msg.sender, "You are not the owner");
     require(waitingForResponse[_pokemonReceiverid] == true, "not been invited to a challenge!");
     uint256 _number = numbss;
-    // require(
-    //   Requestid[Number] == Requestid[_pokemonChallenger, _pokemonReceiver, timestampss]
-    // );
     require(sentAResponse[_pokemonChallengerid] == true, "Pokemon has not sent a Response!");
     acceptedRequest[_number] = true;
 
     emit NumberofFight(_number);
     numbss++;
     attackPokemons(_pokemonReceiverid, _pokemonChallengerid);
-  } // FIXME : positin of inputs of attack pokemon and accept challenge inputs so challenger becomes receiver
+  }
 
   function cancelChallenge(
     uint256 pokemonA,
@@ -109,6 +126,14 @@ contract Fighting is CreatePokemon {
       pokemons[_challengedPokemonid].currentLossCount = 0;
       pokemons[_challengerPokemonid].lossCount++;
       pokemons[_challengerPokemonid].currentLossCount++;
+      emit BattleHappened(
+        _challengerPokemonid,
+        _challengedPokemonid,
+        _battlenumber,
+        block.timestamp,
+        _challengedPokemonid
+      );
+      _battlenumber++;
       if (pokemons[_challengerPokemonid].currentLossCount == 2) {
         triggerCooldown(_challengerPokemonid);
       }
@@ -133,6 +158,14 @@ contract Fighting is CreatePokemon {
       pokemons[_challengerPokemonid].currentLossCount = 0;
       pokemons[_challengedPokemonid].lossCount++;
       pokemons[_challengedPokemonid].currentLossCount++;
+      emit BattleHappened(
+        _challengerPokemonid,
+        _challengedPokemonid,
+        _battlenumber,
+        block.timestamp,
+        _challengerPokemonid
+      );
+      _battlenumber++;
       if (pokemons[_challengedPokemonid].currentLossCount == 2) {
         triggerCooldown(_challengedPokemonid);
       }

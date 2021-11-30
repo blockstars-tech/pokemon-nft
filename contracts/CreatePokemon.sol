@@ -8,12 +8,53 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 
 contract CreatePokemon is PokemonNFT {
   using Counters for Counters.Counter;
-  using SafeMath for uint256;
   Counters.Counter private _tokenID;
-  using SafeMath for uint256;
   uint256 internal randNumber = 0;
   uint256 public increasePowerFee = 0.011 ether;
   uint256 public ownerCut = 0.001 ether;
+  mapping(uint256 => uint256) internal pokemonworth;
+  mapping(address => uint256) internal ownedPokemonCount;
+  mapping(uint256 => address) internal ownerOfPokemon;
+  mapping(uint256 => bool) internal mintedPokemon;
+
+  struct Pokemon {
+    string name;
+    uint256 age;
+    Sex sex;
+    Colors color;
+    uint256 strength;
+    uint256 creationTime;
+    uint32 readyTime;
+    uint16 winCount;
+    uint16 lossCount;
+    uint16 currentLossCount;
+  }
+
+  enum Sex {
+    male,
+    female
+  }
+
+  enum Colors {
+    red,
+    blue,
+    green,
+    yellow,
+    white,
+    black,
+    violet
+  }
+
+  Pokemon[] public pokemons;
+
+  event NewPokemon(
+    uint256 _tokenIds,
+    string name,
+    uint256 _age,
+    Sex _sex,
+    Colors color,
+    uint256 strength
+  );
 
   function mintPokemon(
     string memory _name,
@@ -21,13 +62,7 @@ contract CreatePokemon is PokemonNFT {
     Sex _sex,
     Colors _color,
     uint256 _amount
-  )
-    public
-    payable
-    // uint256 _strength
-    approvedForTrans
-    returns (uint256 _id)
-  {
+  ) public payable approvedForTrans returns (uint256 _id) {
     _id = _tokenID.current();
     require(ownerOfPokemon[_id] == address(0), "This Pokemon is already minted!");
     uint256 totalAmount = _amount * increasePowerFee;
@@ -39,12 +74,11 @@ contract CreatePokemon is PokemonNFT {
     owner.transfer(ownerTax);
     uint256 _strength = 1 + _amount;
     pokemonworth[_id] += _amount;
-    creationTimestamp = block.timestamp;
-    // comment out the creation timestamp?
-    pokemons.push(Pokemon(_name, _age, _sex, _color, _strength, creationTimestamp, 0, 0, 0, 0));
+    pokemons.push(Pokemon(_name, _age, _sex, _color, _strength, block.timestamp, 0, 0, 0, 0));
     ownerOfPokemon[_id] = msg.sender;
     ownedPokemonCount[msg.sender]++;
     mintedPokemon[_id] = true;
+    tokenURI(_id);
     emit NewPokemon(_id, _name, _age, _sex, _color, _strength);
     _safeMint(msg.sender, _tokenID.current());
     _tokenID.increment();
@@ -55,10 +89,8 @@ contract CreatePokemon is PokemonNFT {
     ownerOfPokemon[_id] = address(this);
     if (pokemonworth[_id] != 0) {
       uint256 amounts = pokemonworth[_id] * 0.01 ether;
+      ownedPokemonCount[msg.sender]--;
       payable(msg.sender).transfer(amounts);
-      // (bool sent, ) = msg.sender.call{ value: amounts }("");
-      // removed bytes memory data from second part of the above parameter
-      // require(sent, "Failed to send ether");
     }
     _beforeTokenTransfer(msg.sender, address(0), _id);
   }
