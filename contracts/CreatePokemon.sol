@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 contract CreatePokemon is PokemonNFT {
   using Counters for Counters.Counter;
   Counters.Counter private _tokenID;
-  uint256 internal randNumber = 0;
+  // uint256 internal randNumber = 0;
   uint256 public increasePowerFee = 0.011 ether;
   uint256 public ownerCut = 0.001 ether;
   mapping(uint256 => uint256) internal pokemonworth;
@@ -48,7 +48,7 @@ contract CreatePokemon is PokemonNFT {
   Pokemon[] public pokemons;
 
   event NewPokemon(
-    uint256 _tokenIds,
+    uint256 _tokenId,
     string name,
     uint256 _age,
     Sex _sex,
@@ -69,16 +69,14 @@ contract CreatePokemon is PokemonNFT {
     require(msg.value >= totalAmount, "insufficient funds!!");
     uint256 ownerTax = _amount * ownerCut;
     require(_amount < 10, "max strength allowed is 10");
-    require(msg.value >= totalAmount, "insufficient funds!!");
-    address payable owner;
-    owner.transfer(ownerTax);
+    // require(msg.value >= totalAmount, "insufficient funds!!");
+    payable(owner()).transfer(ownerTax);
     uint256 _strength = 1 + _amount;
     pokemonworth[_id] += _amount;
     pokemons.push(Pokemon(_name, _age, _sex, _color, _strength, block.timestamp, 0, 0, 0, 0));
     ownerOfPokemon[_id] = msg.sender;
     ownedPokemonCount[msg.sender]++;
     mintedPokemon[_id] = true;
-    tokenURI(_id);
     emit NewPokemon(_id, _name, _age, _sex, _color, _strength);
     _safeMint(msg.sender, _tokenID.current());
     _tokenID.increment();
